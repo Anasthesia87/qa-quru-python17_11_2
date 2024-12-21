@@ -6,9 +6,8 @@ from selenium import webdriver
 from utils import attach
 from dotenv import load_dotenv
 
-DEFAULT_BROWSER_VERSION = "126.0"
 DEFAULT_BROWSER_NAME = "chrome"
-
+DEFAULT_BROWSER_VERSION = "126.0"
 
 
 def pytest_addoption(parser):
@@ -34,7 +33,6 @@ def setup_browser(request):
             "enableVideo": True
         }
     }
-
 
     options.capabilities.update(selenoid_capabilities)
 
