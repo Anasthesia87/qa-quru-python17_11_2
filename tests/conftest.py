@@ -7,13 +7,13 @@ from utils import attach
 from dotenv import load_dotenv
 
 DEFAULT_BROWSER_VERSION = "126.0"
+DEFAULT_BROWSER_NAME = "chrome"
+
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        '--browser_version',
-        default='126.0'
-    )
+    parser.addoption("--browser_name")
+    parser.addoption("--browser_version")
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -23,11 +23,11 @@ def load_env():
 
 @pytest.fixture(scope="function")
 def setup_browser(request):
-    browser_version = request.config.getoption('--browser_version')
-    browser_version = browser_version if browser_version != "" else DEFAULT_BROWSER_VERSION
+    browser_name = request.config.getoption('browser_name') or DEFAULT_BROWSER_NAME
+    browser_version = request.config.getoption('browser_version') or DEFAULT_BROWSER_VERSION
     options = Options()
     selenoid_capabilities = {
-        "browserName": "chrome",
+        "browserName": browser_name,
         "browserVersion": browser_version,
         "selenoid:options": {
             "enableVNC": True,
@@ -35,10 +35,12 @@ def setup_browser(request):
         }
     }
 
+
+    options.capabilities.update(selenoid_capabilities)
+
     login = os.getenv('LOGIN')
     password = os.getenv('PASSWORD')
 
-    options.capabilities.update(selenoid_capabilities)
     driver = webdriver.Remote(
         command_executor=f"https://{login}:{password}@selenoid.autotests.cloud/wd/hub",
         options=options)
